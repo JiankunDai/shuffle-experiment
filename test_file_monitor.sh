@@ -5,7 +5,8 @@ set -e
 
 JAR_PATH="target/scala-2.10/spark-shuffle-experiment-1.0.0.jar"
 MASTER="spark://49.52.27.113:7077"
-TEST_DIR="logs/shuffle_file_test_$(date '+%Y%m%d_%H%M%S')"
+# TEST_DIR="logs/shuffle_file_test_$(date '+%Y%m%d_%H%M%S')"
+TEST_DIR="logs/shuffle_file_test_20251204_044258"
 mkdir -p $TEST_DIR
 
 echo "=== Shuffle临时文件数量对比测试 ==="
@@ -19,7 +20,7 @@ get_shuffle_file_count() {
     local mode=$2
     local size=$3  # <--- 新增参数: 数据集大小
     
-    echo "正在分析 [${mode} - ${size}] 日志..."
+    # echo "正在分析 [${mode} - ${size}] 日志..."
     
     # 1. 提取耗时
     local duration=$(grep "执行耗时:" "$log_file" | awk -F': ' '{print $2}' | sed 's/ms//')
@@ -33,12 +34,11 @@ get_shuffle_file_count() {
     # 4. 提取峰值大小
     local file_size=$(grep "峰值Shuffle文件大小:" "$log_file" | awk -F': ' '{print $2}')
     
-    echo "  > 模式: $mode ($size)"
-    echo "  > 耗时: ${duration}ms"
-    echo "  > 文件数: ${file_count}"
-    echo "  > 总大小: ${file_size}"
-    echo ""
-    
+    # echo "  > 模式: $mode ($size)"
+    # echo "  > 耗时: ${duration}ms"
+    # echo "  > 文件数: ${file_count}"
+    # echo "  > 总大小: ${file_size}"
+
     # 返回CSV格式数据: 模式,数据集,耗时,文件数,数据量
     echo "$mode,$size,${duration},${file_count},${shuffle_bytes}"
 }
@@ -98,16 +98,15 @@ run_shuffle_test() {
 
 # === 循环测试 ===
 
-# medium large
-echo "=== 测试阶段 1: Hash Shuffle ==="
-for size in small-x small; do
-    run_shuffle_test "hash" "$size" "Hash Shuffle"
-done
+# echo "=== 测试阶段 1: Hash Shuffle ==="
+# for size in small-x small medium large; do
+#     run_shuffle_test "hash" "$size" "Hash Shuffle"
+# done
 
-echo "=== 测试阶段 2: Sort Shuffle ==="
-for size in small-x small; do
-    run_shuffle_test "sort" "$size" "Sort Shuffle"
-done
+# echo "=== 测试阶段 2: Sort Shuffle ==="
+# for size in small-x small medium large; do
+#     run_shuffle_test "sort" "$size" "Sort Shuffle"
+# done
 
 # === 结果分析 ===
 echo "=== 测试结果分析 ==="

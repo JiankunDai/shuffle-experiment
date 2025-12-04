@@ -1,0 +1,41 @@
+Shuffle Manager,Dataset,Memory,Status,Time(ms),File Count,Shuffle Size
+  > 配置: hash | large | 512M
+  > 状态: Success
+  > 耗时: 89754ms
+
+hash,large,512M,Success,89754,11068,7.35 GB
+  > 配置: sort | large | 512M
+  > 状态: Success
+  > 耗时: 88872ms
+
+sort,large,512M,Success,88872,416,7.35 GB
+  > 配置: hash | large | 1G
+  > 状态: Success
+  > 耗时: 83581ms
+
+hash,large,1G,Success,83581,11097,7.35 GB
+  > 配置: sort | large | 1G
+  > 状态: Success
+  > 耗时: 82016ms
+
+sort,large,1G,Success,82016,420,7.35 GB
+  > 配置: hash | large | 2G
+  > 状态: Success
+  > 耗时: 93773ms
+
+hash,large,2G,Success,93773,10100,7.35 GB
+  > 配置: sort | large | 2G
+  > 状态: Success
+  > 耗时: 79239ms
+
+sort,large,2G,Success,79239,424,7.35 GB
+  > 配置: hash | large | 4G
+  > 状态: Success
+  > 耗时: 76448ms
+
+hash,large,4G,Success,76448,11301,7.35 GB
+  > 配置: sort | large | 4G
+  > 状态: Success
+  > 耗时: 78638ms
+
+sort,large,4G,Success,78638,410,7.35 GB

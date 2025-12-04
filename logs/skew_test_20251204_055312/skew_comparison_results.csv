@@ -1,0 +1,11 @@
+Shuffle Manager,Dataset Size,Zipf Skew,Time (ms),Shuffle Size,Status
+hash,small,0.0,,,Success (No Data)
+sort,small,0.0,,,Success (No Data)
+hash,small,1.0,,,Success (No Data)
+sort,small,1.0,,,Success (No Data)
+hash,small,2.0,,,Success (No Data)
+sort,small,2.0,,,Success (No Data)
+hash,large,0.0,,,Success (No Data)
+sort,large,0.0,,,Success (No Data)
+hash,large,1.0,,,Success (No Data)
+sort,large,1.0,,,Success (No Data)

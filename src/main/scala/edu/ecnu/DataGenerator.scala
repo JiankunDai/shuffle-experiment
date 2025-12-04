@@ -5,34 +5,69 @@ import org.apache.spark.SparkContext
 import scala.util.Random
 
 object DataGenerator {
+
+  /**
+   * 构建 Zipf 累积分布函数 (CDF)
+   * 用于生成符合 Zipf 分布的随机索引
+   */
+  def buildZipfCDF(numKeys: Int, skew: Double): Array[Double] = {
+    val weights = (1 to numKeys).map(k => 1.0 / math.pow(k, skew)).toArray
+    val sum = weights.sum
+    val normalized = weights
+        .scanLeft(0.0)(_ + _)
+        .map(_ / sum)
+    normalized.tail
+  }
+
+  /**
+   * 基于 CDF 进行采样
+   */
+  def zipfSample(cdf: Array[Double]): Int = {
+    val r = Random.nextDouble()
+    cdf.indexWhere(r <= _) match {
+      case -1 => cdf.length - 1
+      case idx => idx
+    }
+  }
   
   /**
    * 生成用户行为数据
    * @param numRecords 记录条数
-   * @param numPartitions 显式指定RDD的分区数，这对Hash Shuffle的文件数量至关重要
+   * @param numPartitions RDD分区数
+   * @param skew 倾斜度 (0.0 = 均匀/UUID, >0.0 = Zipf倾斜)
    */
-  def generateUserBehavior(sqlContext: SQLContext, numRecords: Long, numPartitions: Int): DataFrame = {
+  def generateUserBehavior(sqlContext: SQLContext, numRecords: Long, numPartitions: Int, skew: Double): DataFrame = {
     import sqlContext.implicits._
     
-    // val categories = Array("electronics", "clothing", "books", "home", "sports")
-    // val regions = Array("north", "south", "east", "west", "central")
+    // 定义 Key 的空间大小 (用于 Zipf 采样)
+    val numKeys = 100000 
     
-    // 关键修改：parallelize 的第二个参数指定了分区数
-    // 如果不指定，默认通常只有 2 (取决于CPU核数)，会导致 Hash Shuffle 只能产生很少的文件
+    // 如果需要倾斜，在 Driver 端预计算 CDF 并广播，避免 Task 重复计算
+    val zipfCDF = if (skew > 0) buildZipfCDF(numKeys, skew) else null
+    val bcZipfCDF = if (skew > 0) sqlContext.sparkContext.broadcast(zipfCDF) else null
+
     val rdd = sqlContext.sparkContext.parallelize(1L to numRecords, numPartitions).map { id =>
       val rnd = new Random()
-      // 预先生成一个随机的 byte 数组作为 payload，避免每次循环都生成带来的 CPU 压力
-      // 但为了防止压缩，我们准备几个不同的模版轮询使用
+      
+      // 生成 Payload (1KB)
       val payloadTemplates = (1 to 10).map { _ => 
-        val bytes = new Array[Byte](1024) // 1KB
+        val bytes = new Array[Byte](1024) 
         rnd.nextBytes(bytes)
-        new String(bytes, "ISO-8859-1") //以此编码转string保持长度
+        new String(bytes, "ISO-8859-1") 
       }.toArray
-
-      val key = java.util.UUID.randomUUID().toString
-      val value = rnd.nextDouble() * 1000
-      // 随机选一个模版
       val bigData = payloadTemplates(rnd.nextInt(payloadTemplates.length))
+
+      // === 核心修改逻辑 ===
+      val key = if (skew > 0) {
+         // 倾斜模式: 使用 Zipf 分布采样 Key
+         val rank = zipfSample(bcZipfCDF.value)
+         f"key_$rank%08d" 
+      } else {
+         // 均匀模式: 使用 UUID
+         java.util.UUID.randomUUID().toString
+      }
+
+      val value = rnd.nextDouble() * 1000
       
       (key, value, "category_placeholder", bigData)
     }
@@ -40,47 +75,36 @@ object DataGenerator {
     sqlContext.createDataFrame(rdd).toDF("key", "value", "category", "payload")
   }
 
+  // === 各种规模的工厂方法 (透传 skew 参数) ===
 
-  def generateSmallX(sqlContext: SQLContext): DataFrame = {
-    // 10万条 * 1KB ≈ 100MB 数据
-    // 10 分区 -> Hash产生 2000 个文件 (每个约 50KB)
-    generateUserBehavior(sqlContext, 10000L, 5)
+  def generateSmallX(sqlContext: SQLContext, skew: Double): DataFrame = {
+    generateUserBehavior(sqlContext, 10000L, 5, skew)
   }
 
-  // 定义不同规模数据集的配置
-  def generateSmall(sqlContext: SQLContext): DataFrame = {
-    // 10万条 * 1KB ≈ 100MB 数据
-    // 10 分区 -> Hash产生 2000 个文件 (每个约 50KB)
-    generateUserBehavior(sqlContext, 100000L, 10) 
+  def generateSmall(sqlContext: SQLContext, skew: Double): DataFrame = {
+    generateUserBehavior(sqlContext, 100000L, 10, skew) 
   }
 
-  def generateMedium(sqlContext: SQLContext): DataFrame = {
-    // 100万条 * 1KB ≈ 1GB 数据
-    // 50 分区 -> Hash产生 10000 个文件 (每个约 100KB)
-    // 这时候 Hash Shuffle 的写文件速度会开始明显变慢
-    generateUserBehavior(sqlContext, 1000000L, 50)
+  def generateMedium(sqlContext: SQLContext, skew: Double): DataFrame = {
+    generateUserBehavior(sqlContext, 1000000L, 50, skew)
   }
 
-  def generateLarge(sqlContext: SQLContext): DataFrame = {
-    // 500万条 * 1KB ≈ 5GB 数据
-    // 100 分区 -> Hash产生 20000 个文件
-    // 这可能会把你的磁盘打满或非常慢，非常适合做压力测试
-    generateUserBehavior(sqlContext, 5000000L, 200)
+  def generateLarge(sqlContext: SQLContext, skew: Double): DataFrame = {
+    generateUserBehavior(sqlContext, 5000000L, 200, skew)
   }
   
   /**
-   * 🏭 工厂方法：根据传入的 size 字符串动态生成数据
-   * 替代原来的 generateDatasets Map 方式，避免一次性生成所有数据导致内存溢出
+   * 统一入口
    */
-  def generate(sqlContext: SQLContext, size: String): DataFrame = {
+  def generate(sqlContext: SQLContext, size: String, skew: Double): DataFrame = {
     size.toLowerCase match {
-      case "small-x" => generateSmallX(sqlContext)
-      case "small"  => generateSmall(sqlContext)
-      case "medium" => generateMedium(sqlContext)
-      case "large"  => generateLarge(sqlContext)
+      case "small-x" => generateSmallX(sqlContext, skew)
+      case "small"  => generateSmall(sqlContext, skew)
+      case "medium" => generateMedium(sqlContext, skew)
+      case "large"  => generateLarge(sqlContext, skew)
       case _ => 
         println(s"警告: 未知的数据集大小 '$size'，默认使用 small")
-        generateSmall(sqlContext)
+        generateSmall(sqlContext, skew)
     }
   }
 }
