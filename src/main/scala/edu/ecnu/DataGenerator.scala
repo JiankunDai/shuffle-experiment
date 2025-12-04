@@ -107,4 +107,55 @@ object DataGenerator {
         generateSmall(sqlContext, skew)
     }
   }
+
+  /**
+   * 加载 TPC-H 数据并根据场景构建 DataFrame
+   * * @param inputPath TPC-H lineitem.tbl 的路径 (例如 file:///tmp/tpch/lineitem.tbl)
+   * @param scenario  实验场景: "uniform" (基准), "longtail" (长尾), "skew" (倾斜)
+   * @return DataFrame schema: [key, placeholder, placeholder, payload] 
+   * (保持4列是为了兼容 ShuffleExperiment 中 row.getString(3) 的取值逻辑)
+   */
+  def loadTpch(sqlContext: SQLContext, inputPath: String, scenario: String): DataFrame = {
+    import sqlContext.implicits._
+    val sc = sqlContext.sparkContext
+
+    // 1. 读取原始文本
+    // 关键点：本地读取通常只有1个分区，必须 repartition 才能模拟并发 Shuffle
+    val rawRdd = sc.textFile(inputPath)
+      .repartition(100) // 建议根据机器核数调整，比如 2 * cores 或固定 100
+
+    val processedRdd = rawRdd.map { line =>
+      val parts = line.split("\\|")
+      // lineitem.tbl 常用字段索引:
+      // 0: L_ORDERKEY, 1: L_PARTKEY, 2: L_SUPPKEY
+      
+      val key = scenario.toLowerCase match {
+        case "uniform" =>
+          // === 场景1: 基准 (Uniform) ===
+          // 使用 L_ORDERKEY，分布非常均匀
+          parts(0)
+
+        case "longtail" =>
+          // === 场景2: 长尾/高基数 (High Cardinality) ===
+          // 组合 L_PARTKEY + L_SUPPKEY
+          // Key 的数量极大，测试 Hash Shuffle 的 Map 端内存压力
+          parts(1) + "_" + parts(2)
+
+        case "skew" =>
+          // === 场景3: 数据倾斜 (Skew) ===
+          // 人为制造倾斜：让 20% 的数据集中到一个 Key
+          val orderKey = try { parts(0).toLong } catch { case _: Exception => 0L }
+          if (orderKey % 5 == 0) "HOT_SPOT_KEY" else parts(0)
+
+        case _ => parts(0)
+      }
+
+      // 为了兼容 ShuffleExperiment 中的 row.getString(3)，我们需要构造 4 列
+      // (Key, Pad1, Pad2, Payload/Value)
+      (key, "pad", "pad", line) 
+    }
+
+    sqlContext.createDataFrame(processedRdd)
+      .toDF("key", "pad1", "pad2", "payload")
+  }
 }
