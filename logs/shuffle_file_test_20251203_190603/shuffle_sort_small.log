@@ -1,0 +1,81 @@
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+25/12/03 19:08:42 INFO SparkContext: Running Spark version 1.6.3
+25/12/03 19:08:42 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+25/12/03 19:08:42 WARN SparkConf: In Spark 1.0 and later spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone and LOCAL_DIRS in YARN).
+25/12/03 19:08:42 WARN Utils: Your hostname, hygon7490 resolves to a loopback address: 127.0.0.1; using 49.52.27.65 instead (on interface ens2f1np1)
+25/12/03 19:08:42 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+25/12/03 19:08:42 INFO SecurityManager: Changing view acls to: djk
+25/12/03 19:08:42 INFO SecurityManager: Changing modify acls to: djk
+25/12/03 19:08:42 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: Set(djk); users with modify permissions: Set(djk)
+25/12/03 19:08:42 INFO Utils: Successfully started service 'sparkDriver' on port 40847.
+25/12/03 19:08:43 INFO Slf4jLogger: Slf4jLogger started
+25/12/03 19:08:43 INFO Remoting: Starting remoting
+25/12/03 19:08:43 INFO Remoting: Remoting started; listening on addresses :[akka.tcp://sparkDriverActorSystem@49.52.27.65:34833]
+25/12/03 19:08:43 INFO Utils: Successfully started service 'sparkDriverActorSystem' on port 34833.
+25/12/03 19:08:43 INFO SparkEnv: Registering MapOutputTracker
+25/12/03 19:08:43 INFO SparkEnv: Registering BlockManagerMaster
+25/12/03 19:08:43 INFO DiskBlockManager: Created local directory at /tmp/spark/work/blockmgr-f87963f2-7936-4f81-8f63-124145c71b74
+25/12/03 19:08:43 INFO MemoryStore: MemoryStore started with capacity 143.3 MB
+25/12/03 19:08:43 INFO SparkEnv: Registering OutputCommitCoordinator
+25/12/03 19:08:43 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+25/12/03 19:08:43 INFO SparkUI: Started SparkUI at http://49.52.27.65:4040
+25/12/03 19:08:43 INFO HttpFileServer: HTTP File server directory is /tmp/spark/work/spark-eb14e74b-9ad5-472d-8e67-24ac1b062358/httpd-88094a09-ae27-41a3-9ea3-92f7f6a72ace
+25/12/03 19:08:43 INFO HttpServer: Starting HTTP Server
+25/12/03 19:08:43 INFO Utils: Successfully started service 'HTTP file server' on port 41767.
+25/12/03 19:08:43 INFO SparkContext: Added JAR file:/home/djk/Documents/shuffle-experiment/target/scala-2.10/spark-shuffle-experiment-1.0.0.jar at http://49.52.27.65:41767/jars/spark-shuffle-experiment-1.0.0.jar with timestamp 1764788923885
+25/12/03 19:08:43 INFO AppClient$ClientEndpoint: Connecting to master spark://49.52.27.113:7077...
+25/12/03 19:08:54 INFO SparkDeploySchedulerBackend: Connected to Spark cluster with app ID app-20251203140850-0075
+25/12/03 19:08:54 INFO AppClient$ClientEndpoint: Executor added: app-20251203140850-0075/0 on worker-20251203224515-49.52.27.60-35123 (49.52.27.60:35123) with 2 cores
+25/12/03 19:08:54 INFO SparkDeploySchedulerBackend: Granted executor ID app-20251203140850-0075/0 on hostPort 49.52.27.60:35123 with 2 cores, 1024.0 MB RAM
+25/12/03 19:08:54 INFO AppClient$ClientEndpoint: Executor added: app-20251203140850-0075/1 on worker-20251203144508-49.52.27.65-34725 (49.52.27.65:34725) with 2 cores
+25/12/03 19:08:54 INFO SparkDeploySchedulerBackend: Granted executor ID app-20251203140850-0075/1 on hostPort 49.52.27.65:34725 with 2 cores, 1024.0 MB RAM
+25/12/03 19:08:54 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 44835.
+25/12/03 19:08:54 INFO NettyBlockTransferService: Server created on 44835
+25/12/03 19:08:54 INFO BlockManagerMaster: Trying to register BlockManager
+25/12/03 19:08:54 INFO BlockManagerMasterEndpoint: Registering block manager 49.52.27.65:44835 with 143.3 MB RAM, BlockManagerId(driver, 49.52.27.65, 44835)
+25/12/03 19:08:54 INFO BlockManagerMaster: Registered BlockManager
+25/12/03 19:08:54 INFO AppClient$ClientEndpoint: Executor updated: app-20251203140850-0075/1 is now RUNNING
+25/12/03 19:08:54 INFO AppClient$ClientEndpoint: Executor updated: app-20251203140850-0075/0 is now RUNNING
+25/12/03 19:09:02 INFO EventLoggingListener: Logging events to file:/tmp/spark-events/app-20251203140850-0075
+25/12/03 19:09:02 INFO SparkDeploySchedulerBackend: SchedulerBackend is ready for scheduling beginning after reached minRegisteredResourcesRatio: 0.0
+25/12/03 19:09:02 INFO SparkDeploySchedulerBackend: Registered executor NettyRpcEndpointRef(null) (49.52.27.65:53406) with ID 1
+25/12/03 19:09:02 INFO BlockManagerMasterEndpoint: Registering block manager 49.52.27.65:46501 with 509.3 MB RAM, BlockManagerId(1, 49.52.27.65, 46501)
+25/12/03 19:09:02 INFO SparkDeploySchedulerBackend: Registered executor NettyRpcEndpointRef(null) (49.52.27.60:56864) with ID 0
+=== Shuffle File Monitor 实验 ===
+3. Spark版本: 1.6.3
+默认shuffle分区数: 200
+请求的Shuffle Manager: sort
+当前 Shuffle Manager: sort
+Spark 本地目录: /tmp/spark/work
+监控将每秒检查一次 /tmp/spark/work 目录中的 shuffle_* 文件
+测试数据集: small
+分区数: 10
+>>> 正在进行数据预热 (Cache & Count)...
+>>> 预热完成! 数据已驻留内存。耗时: 13692ms, 记录数: 100000
+>>> 现在开始正式 Shuffle 实验 (此时文件应该会立即产生)
+
+=== 开始运行 sort 实验 ===
+启动Shuffle文件监控，每秒检查一次...
+[ShuffleMonitor 19:09:17] 文件数: 4, 总大小: 0KB (峰值: 4文件, 0KB)
+[ShuffleMonitor 19:09:18] 文件数: 4, 总大小: 0KB (峰值: 4文件, 0KB)
+[ShuffleMonitor 19:09:19] 文件数: 12, 总大小: 60.20MB (峰值: 12文件, 60.20MB)
+[ShuffleMonitor 19:09:20] 文件数: 16, 总大小: 90.30MB (峰值: 16文件, 90.30MB)
+[ShuffleMonitor 19:09:21] 文件数: 16, 总大小: 90.30MB (峰值: 16文件, 90.30MB)
+[ShuffleMonitor 19:09:22] 文件数: 16, 总大小: 90.30MB (峰值: 16文件, 90.30MB)
+[ShuffleMonitor 19:09:23] 文件数: 16, 总大小: 90.30MB (峰值: 16文件, 90.30MB)
+[ShuffleMonitor 19:09:24] 文件数: 16, 总大小: 90.30MB (峰值: 16文件, 90.30MB)
+[ShuffleMonitor 19:09:25] 文件数: 16, 总大小: 90.30MB (峰值: 16文件, 90.30MB)
+
+[ShuffleMonitor 最终报告]
+峰值文件数: 16
+峰值文件大小: 90.30MB
+推测Shuffle类型: Sort Shuffle
+
+==================================================
+测试结果 [sort]:
+  执行耗时: 3889ms
+  Shuffle数据量: 150.49 MB
+  峰值Shuffle文件数: 16 个
+  峰值Shuffle文件大小: 92464KB (90.30MB)
+  Shuffle类型分析: Sort Shuffle (文件高度合并: 16 个)
+  平均每个文件大小: 5779KB

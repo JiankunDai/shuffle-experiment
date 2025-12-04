@@ -1,0 +1,43 @@
+模式,数据集,耗时(ms),峰值文件数,Shuffle数据量
+正在分析 [hash - small] 日志...
+  > 模式: hash (small)
+  > 耗时: 5679ms
+  > 文件数: 3002
+  > 总大小: 92459KB (90.29MB)
+
+hash,small,5679,3002,150.49 MB
+正在分析 [hash - medium] 日志...
+  > 模式: hash (medium)
+  > 耗时: 39586ms
+  > 文件数: 16021
+  > 总大小: 986248KB (963.13MB)
+
+hash,medium,39586,16021,1.47 GB
+正在分析 [hash - large] 日志...
+  > 模式: hash (large)
+  > 耗时: 327273ms
+  > 文件数: 28071
+  > 总大小: 2080377KB (2031.62MB)
+
+hash,large,327273,28071,7.35 GB
+正在分析 [sort - small] 日志...
+  > 模式: sort (small)
+  > 耗时: 4839ms
+  > 文件数: 16
+  > 总大小: 92480KB (90.31MB)
+
+sort,small,4839,16,150.48 MB
+正在分析 [sort - medium] 日志...
+  > 模式: sort (medium)
+  > 耗时: 31482ms
+  > 文件数: 96
+  > 总大小: 801410KB (782.63MB)
+
+sort,medium,31482,96,1.47 GB
+正在分析 [sort - large] 日志...
+  > 模式: sort (large)
+  > 耗时: 143021ms
+  > 文件数: 422
+  > 总大小: 4238216KB (4138.88MB)
+
+sort,large,143021,422,7.35 GB

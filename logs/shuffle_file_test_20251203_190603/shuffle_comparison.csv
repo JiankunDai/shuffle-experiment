@@ -1,0 +1,15 @@
+模式,数据集,耗时(ms),峰值文件数,Shuffle数据量
+正在分析 [hash - small] 日志...
+  > 模式: hash (small)
+  > 耗时: 3758ms
+  > 文件数: 602
+  > 总大小: 92467KB (90.30MB)
+
+hash,small,3758,602,150.49 MB
+正在分析 [sort - small] 日志...
+  > 模式: sort (small)
+  > 耗时: 3889ms
+  > 文件数: 16
+  > 总大小: 92464KB (90.30MB)
+
+sort,small,3889,16,150.49 MB
